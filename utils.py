@@ -8,12 +8,14 @@ from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 
 
-
 #################### PARAMETERS
-
 DATASET_PATH = "./Resources/ratings.csv"
 OUTPUT_PATH = "./Output"
-
+VOCABULARY_SIZE = 5000
+MAX_REVIEW_LENGTH = 250
+EMBEDDING_DIM = 16
+NUM_EPOCHS = 10
+####################
 
 def plot_class_balance(data, title, filename):
     fig, ax = plt.subplots()
@@ -47,3 +49,26 @@ def text_preprocessing(text):
     text = " ".join(text_tokens)
 
     return text
+
+def plot_loss_acc(epochs, train_loss, val_loss, train_acc, val_acc):
+    plt.figure(figsize=(9, 3))
+
+    plt.subplot(1, 2, 1)
+
+    plt.plot(epochs, train_loss, 'bo', label='Training loss')
+    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+
+    plt.plot(epochs, train_acc, 'go', label='Training acc')
+    plt.plot(epochs, val_acc, 'g', label='Validation acc')
+    plt.title('Training and validation accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend(loc='lower right')
+
+    plt.savefig(f"{OUTPUT_PATH}/Train_vs_Validation_DS.png")
