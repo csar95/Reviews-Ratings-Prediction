@@ -12,9 +12,9 @@ from nltk.stem import WordNetLemmatizer
 DATASET_PATH = "./Resources/ratings.csv"
 OUTPUT_PATH = "./Output"
 VOCABULARY_SIZE = 5000
-MAX_REVIEW_LENGTH = 250
-EMBEDDING_DIM = 16
-NUM_EPOCHS = 10
+MAX_REVIEW_LENGTH = 100
+EMBEDDING_DIM = 32
+NUM_EPOCHS = 50
 ####################
 
 def plot_class_balance(data, title, filename):
@@ -51,12 +51,12 @@ def text_preprocessing(text):
     return text
 
 def plot_loss_acc(epochs, train_loss, val_loss, train_acc, val_acc):
-    plt.figure(figsize=(9, 3))
+    plt.figure(figsize=(9, 4))
 
     plt.subplot(1, 2, 1)
 
-    plt.plot(epochs, train_loss, 'bo', label='Training loss')
-    plt.plot(epochs, val_loss, 'b', label='Validation loss')
+    plt.plot(epochs, train_loss, 'b-', label='Training loss')
+    plt.plot(epochs, val_loss, 'b--', label='Validation loss')
     plt.title('Training and validation loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
@@ -64,8 +64,8 @@ def plot_loss_acc(epochs, train_loss, val_loss, train_acc, val_acc):
 
     plt.subplot(1, 2, 2)
 
-    plt.plot(epochs, train_acc, 'go', label='Training acc')
-    plt.plot(epochs, val_acc, 'g', label='Validation acc')
+    plt.plot(epochs, train_acc, 'g-', label='Training acc')
+    plt.plot(epochs, val_acc, 'g--', label='Validation acc')
     plt.title('Training and validation accuracy')
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')

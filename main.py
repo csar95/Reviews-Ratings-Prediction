@@ -46,11 +46,11 @@ print(train_df['RATING'].value_counts())
 print(val_df['RATING'].value_counts())
 
 target = train_df.pop('RATING')
-raw_train_ds = tf.data.Dataset.from_tensor_slices((train_df.values, target.values))
+raw_train_ds = tf.data.Dataset.from_tensor_slices((train_df.values, target.values)).batch(32)
 target = test_df.pop('RATING')
-raw_test_ds = tf.data.Dataset.from_tensor_slices((test_df.values, target.values))
+raw_test_ds = tf.data.Dataset.from_tensor_slices((test_df.values, target.values)).batch(32)
 target = val_df.pop('RATING')
-raw_val_ds = tf.data.Dataset.from_tensor_slices((val_df.values, target.values))
+raw_val_ds = tf.data.Dataset.from_tensor_slices((val_df.values, target.values)).batch(32)
 
 vectorize_layer = layers.experimental.preprocessing.TextVectorization(
     max_tokens=VOCABULARY_SIZE,
@@ -58,7 +58,6 @@ vectorize_layer = layers.experimental.preprocessing.TextVectorization(
     output_sequence_length=MAX_REVIEW_LENGTH)
 
 def vectorize_text(review, rating):
-    review = tf.expand_dims(review, -1)
     return vectorize_layer(review), rating
 
 # Analyze the dataset, determine the frequency of individual string values, and create a 'vocabulary' from them
@@ -74,7 +73,7 @@ test_ds = raw_test_ds.map(vectorize_text)
 
 model = tf.keras.Sequential([
     # This layer takes the integer-encoded text and looks up an embedding vector for each word-index. These vectors are learned as the model trains.
-    layers.Embedding(input_dim=VOCABULARY_SIZE + 1,  # Size of the vocabulary (i.e. maximum integer index + 1)
+    layers.Embedding(input_dim=VOCABULARY_SIZE +1,  # Size of the vocabulary (i.e. maximum integer index + 1)
                      output_dim=EMBEDDING_DIM,
                      input_length=MAX_REVIEW_LENGTH),  # Length of input sequences, when it is constant
     layers.Dropout(0.2),
@@ -96,7 +95,7 @@ print(model.summary())
 
 #################### TRAIN AND EVALUATE THE MODEL
 
-history = model.fit(train_ds, validation_data=val_ds, epochs=NUM_EPOCHS)
+history = model.fit(train_ds, validation_data=val_ds, epochs=NUM_EPOCHS, verbose=2)
 
 loss, accuracy = model.evaluate(test_ds)
 print(f"Loss: {loss}")
