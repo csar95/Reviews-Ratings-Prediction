@@ -11,10 +11,10 @@ from nltk.stem import WordNetLemmatizer
 #################### PARAMETERS
 DATASET_PATH = "./Resources/ratings.csv"
 OUTPUT_PATH = "./Output"
-VOCABULARY_SIZE = 5000
+VOCABULARY_SIZE = 5200
 MAX_REVIEW_LENGTH = 100
 EMBEDDING_DIM = 32
-NUM_EPOCHS = 50
+NUM_EPOCHS = 75
 ####################
 
 def plot_class_balance(data, title, filename):
