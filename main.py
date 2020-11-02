@@ -80,22 +80,26 @@ test_ds = raw_test_ds.map(vectorize_text)
 
 #################### CREATE THE MODEL
 
-model = tf.keras.Sequential([
-    # This layer takes the integer-encoded text and looks up an embedding vector for each word-index. These vectors are learned as the model trains.
-    layers.Embedding(input_dim=VOCABULARY_SIZE +1,  # Size of the vocabulary (i.e. maximum integer index + 1)
-                     output_dim=EMBEDDING_DIM,
-                     input_length=MAX_REVIEW_LENGTH),  # Length of input sequences, when it is constant
-    layers.Dropout(0.2),
-    layers.GlobalAveragePooling1D(),
-    layers.Dropout(0.2),
-    layers.Dense(ratings.size, activation="softmax")
-])
+def create_model():
+    new_model = tf.keras.Sequential([
+        # This layer takes the integer-encoded text and looks up an embedding vector for each word-index. These vectors are learned as the model trains.
+        layers.Embedding(input_dim=VOCABULARY_SIZE +1,  # Size of the vocabulary (i.e. maximum integer index + 1)
+                         output_dim=EMBEDDING_DIM,
+                         input_length=MAX_REVIEW_LENGTH),  # Length of input sequences, when it is constant
+        layers.Dropout(0.2),
+        layers.GlobalAveragePooling1D(),
+        layers.Dropout(0.2),
+        layers.Dense(ratings.size, activation="softmax")
+    ])
 
-model.compile(
-    loss=losses.SparseCategoricalCrossentropy(from_logits=True),
-    optimizer='adam',
-    metrics=['accuracy'])
+    new_model.compile(
+        loss=losses.SparseCategoricalCrossentropy(from_logits=True),
+        optimizer='adam',
+        metrics=['accuracy'])
 
+    return new_model
+
+model = create_model()
 print(model.summary())
 
 #################### TRAIN AND EVALUATE THE MODEL
@@ -107,3 +111,23 @@ print(f"Loss: {loss}")
 print(f"Accuracy: {accuracy}")
 
 plot_loss_acc(range(1, NUM_EPOCHS +1), history.history['loss'], history.history['val_loss'], history.history['accuracy'], history.history['val_accuracy'])
+
+# model.save_weights("./Checkpoints/weights")
+
+#################### LOAD MODEL AND CONF. MATRIX
+
+# p_model = create_model()
+# p_model.load_weights("./Checkpoints/weights")
+
+# Print confusion matrix
+x, y_target = [], []
+for batch in test_ds:
+    for idx, review in enumerate(batch[0]):
+        x.append(np.array(review))
+        y_target.append(np.array(batch[1][idx]))
+
+y_pred = model.predict(np.array(x))
+
+print(tf.math.confusion_matrix(labels=np.array(y_target),
+                               predictions=np.argmax(y_pred, axis=1),
+                               num_classes=ratings.size))
